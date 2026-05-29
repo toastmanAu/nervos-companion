@@ -183,8 +183,90 @@ fun AppsScreen(modifier: Modifier = Modifier) {
             }
           )
         }
+        
+        item {
+          Card(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f)),
+            shape = RoundedCornerShape(12.dp)
+          ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+              Text(
+                text = "Are you a developer?",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+              )
+              Spacer(modifier = Modifier.height(4.dp))
+              Text(
+                text = "Submit a request to add your Nervos project to this directory or update existing listing details.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+              )
+              Spacer(modifier = Modifier.height(12.dp))
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+              ) {
+                OutlinedButton(
+                  onClick = {
+                    val body = """
+                      Please fill out the details below to request adding your application:
+                      
+                      Application Name: 
+                      Short Description: 
+                      Website URL: 
+                      Twitter URL (Optional): 
+                      GitHub URL (Optional): 
+                      Discord URL (Optional): 
+                      Banner Gradient Hex Colors (comma-separated, e.g., #8A2387, #E94057): 
+                    """.trimIndent()
+                    launchEmailIntent(context, "developer@example.com", "[Nervos Companion] Ecosystem App Submission", body)
+                  },
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text("Submit App", fontSize = 12.sp)
+                }
+                
+                OutlinedButton(
+                  onClick = {
+                    val body = """
+                      Please describe the details you would like to update:
+                      
+                      Application Name: 
+                      Updated Description: 
+                      Updated Website URL: 
+                      Updated Twitter URL: 
+                      Updated GitHub URL: 
+                      Updated Discord URL: 
+                      Updated Banner Gradient Hex Colors: 
+                    """.trimIndent()
+                    launchEmailIntent(context, "developer@example.com", "[Nervos Companion] Ecosystem App Update Request", body)
+                  },
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text("Update App", fontSize = 12.sp)
+                }
+              }
+            }
+          }
+        }
       }
     }
+  }
+}
+
+fun launchEmailIntent(context: android.content.Context, to: String, subject: String, body: String) {
+  val intent = Intent(Intent.ACTION_SENDTO).apply {
+    data = Uri.parse("mailto:")
+    putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
+    putExtra(Intent.EXTRA_SUBJECT, subject)
+    putExtra(Intent.EXTRA_TEXT, body)
+  }
+  try {
+    context.startActivity(Intent.createChooser(intent, "Send Email Using..."))
+  } catch (e: Exception) {
+    android.widget.Toast.makeText(context, "No email client found", android.widget.Toast.LENGTH_SHORT).show()
   }
 }
 

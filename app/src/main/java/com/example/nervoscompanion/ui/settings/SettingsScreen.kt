@@ -279,5 +279,57 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         )
       }
     }
+
+    Card(
+      modifier = Modifier.fillMaxWidth(),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+      Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+          text = "Feedback & Bug Report",
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+          text = "Help us improve the companion app. Report bugs, suggest features, or submit feedback directly to the team.",
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(
+          onClick = {
+            val body = """
+              Device Information:
+              Android Version: ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})
+              Device Model: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}
+              App Version: 1.0
+              
+              Description of Bug / Feedback:
+              
+              
+              Steps to Reproduce (if bug):
+              1.
+              2.
+            """.trimIndent()
+            
+            val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+              data = android.net.Uri.parse("mailto:")
+              putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("developer@example.com"))
+              putExtra(android.content.Intent.EXTRA_SUBJECT, "[Nervos Companion] Feedback & Bug Report")
+              putExtra(android.content.Intent.EXTRA_TEXT, body)
+            }
+            try {
+              context.startActivity(android.content.Intent.createChooser(intent, "Send Feedback Using..."))
+            } catch (e: Exception) {
+              Toast.makeText(context, "No email client found", Toast.LENGTH_SHORT).show()
+            }
+          },
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text("Send Feedback / Bug Report")
+        }
+      }
+    }
   }
 }
