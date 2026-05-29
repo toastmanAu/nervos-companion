@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -272,6 +274,7 @@ fun launchEmailIntent(context: android.content.Context, to: String, subject: Str
   }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EcosystemAppCard(
   app: EcosystemApp,
@@ -337,16 +340,15 @@ fun EcosystemAppCard(
       }
 
       // Action Buttons Under the Panel
-      Row(
+      FlowRow(
         modifier = Modifier
           .fillMaxWidth()
           .padding(8.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
       ) {
         OutlinedButton(
           onClick = { onLinkClick(app.websiteUrl) },
-          modifier = Modifier.padding(horizontal = 4.dp),
           colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary
           )
@@ -356,8 +358,7 @@ fun EcosystemAppCard(
 
         app.twitterUrl?.let { url ->
           OutlinedButton(
-            onClick = { onLinkClick(url) },
-            modifier = Modifier.padding(horizontal = 4.dp)
+            onClick = { onLinkClick(url) }
           ) {
             Text("X / Twitter", fontSize = 12.sp)
           }
@@ -365,8 +366,7 @@ fun EcosystemAppCard(
 
         app.githubUrl?.let { url ->
           OutlinedButton(
-            onClick = { onLinkClick(url) },
-            modifier = Modifier.padding(horizontal = 4.dp)
+            onClick = { onLinkClick(url) }
           ) {
             Text("GitHub", fontSize = 12.sp)
           }
@@ -374,8 +374,7 @@ fun EcosystemAppCard(
 
         app.discordUrl?.let { url ->
           OutlinedButton(
-            onClick = { onLinkClick(url) },
-            modifier = Modifier.padding(horizontal = 4.dp)
+            onClick = { onLinkClick(url) }
           ) {
             Text("Discord", fontSize = 12.sp)
           }

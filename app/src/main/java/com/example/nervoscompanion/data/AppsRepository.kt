@@ -125,7 +125,7 @@ class AppsRepository(private val settingsStore: SettingsStore) {
       EcosystemApp(
         name = "Nervos DAO",
         description = "Deposit your CKB into the system smart contract to offset secondary issuance inflation.",
-        websiteUrl = "https://docs.nervos.org/docs/basics/concepts/nervos-dao",
+        websiteUrl = "https://explorer.nervos.org/nervosdao",
         twitterUrl = "https://x.com/NervosNetwork",
         githubUrl = "https://github.com/nervosnetwork",
         discordUrl = "https://discord.gg/nervos",
