@@ -40,6 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import com.example.nervoscompanion.News
+import com.example.nervoscompanion.R
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.example.nervoscompanion.data.RpcClient
 import com.example.nervoscompanion.data.SettingsStore
 import kotlinx.coroutines.Dispatchers
@@ -141,35 +145,37 @@ fun HomeScreen(onNavigate: (NavKey) -> Unit, modifier: Modifier = Modifier) {
     // 1. Hero Logo Card (Premium Graphic Visual Theme)
     Card(
       modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(16.dp),
-      colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+      shape = RoundedCornerShape(16.dp)
     ) {
       Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .background(
-            Brush.verticalGradient(
-              colors = listOf(Color(0xFF001510), Color(0xFF0D47A1))
-            )
-          )
-          .padding(24.dp)
+        modifier = Modifier.fillMaxWidth()
       ) {
-        Column {
-          Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-              modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF00CC99)),
-              contentAlignment = Alignment.Center
-            ) {
-              Text(
-                text = "CKB",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
+        Image(
+          painter = painterResource(id = R.drawable.panel_hero),
+          contentDescription = null,
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.matchParentSize()
+        )
+        Box(
+          modifier = Modifier
+            .matchParentSize()
+            .background(
+              Brush.verticalGradient(
+                colors = listOf(Color.Black.copy(alpha = 0.4f), Color.Black.copy(alpha = 0.85f))
               )
-            }
+            )
+        )
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+        ) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+              painter = painterResource(id = R.drawable.logo_white),
+              contentDescription = "Nervos Logo",
+              modifier = Modifier.size(48.dp)
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
               Text(
@@ -188,7 +194,7 @@ fun HomeScreen(onNavigate: (NavKey) -> Unit, modifier: Modifier = Modifier) {
           Spacer(modifier = Modifier.height(16.dp))
           Text(
             text = "Connected RPC: $rpcUrl",
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color.White.copy(alpha = 0.75f),
             fontSize = 12.sp
           )
           Text(
