@@ -21,4 +21,18 @@ class SettingsStore(context: Context) {
   var configBaseUrl: String
     get() = prefs.getString("config_base_url", "https://raw.githubusercontent.com/nervosnetwork/community/main/") ?: "https://raw.githubusercontent.com/nervosnetwork/community/main/"
     set(value) = prefs.edit().putString("config_base_url", value).apply()
+
+  fun getFavouriteApps(): Set<String> {
+    return prefs.getStringSet("favourite_apps", emptySet())?.toSet() ?: emptySet()
+  }
+
+  fun toggleFavouriteApp(appName: String) {
+    val current = getFavouriteApps().toMutableSet()
+    if (current.contains(appName)) {
+      current.remove(appName)
+    } else {
+      current.add(appName)
+    }
+    prefs.edit().putStringSet("favourite_apps", current).apply()
+  }
 }

@@ -18,13 +18,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedFilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,12 +65,17 @@ fun AppsScreen(modifier: Modifier = Modifier) {
   var isLoading by remember { mutableStateOf(false) }
   var errorMsg by remember { mutableStateOf<String?>(null) }
 
+  var searchQuery by remember { mutableStateOf("") }
+  var showFavouritesOnly by remember { mutableStateOf(false) }
+  var favouriteApps by remember { mutableStateOf(settingsStore.getFavouriteApps()) }
+
   fun loadApps() {
     isLoading = true
     errorMsg = null
     coroutineScope.launch {
       try {
-        appsList = appsRepository.fetchApps()
+        // Randomize the order of apps when loading for fairness of visibility
+        appsList = appsRepository.fetchApps().shuffled()
       } catch (e: Exception) {
         errorMsg = "Failed to load apps: ${e.localizedMessage}"
       } finally {
@@ -75,18 +88,62 @@ fun AppsScreen(modifier: Modifier = Modifier) {
     loadApps()
   }
 
+  val filteredApps = appsList.filter { app ->
+    val matchesSearch = app.name.contains(searchQuery, ignoreCase = true) ||
+        app.description.contains(searchQuery, ignoreCase = true)
+    val matchesFavourite = !showFavouritesOnly || favouriteApps.contains(app.name)
+    matchesSearch && matchesFavourite
+  }
+
   Column(
     modifier = modifier
       .fillMaxSize()
       .padding(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp)
   ) {
-    Text(
-      text = "Ecosystem Directory",
-      style = MaterialTheme.typography.headlineMedium,
-      fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.primary
-    )
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Text(
+        text = "Ecosystem Directory",
+        style = MaterialTheme.typography.headlineMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary
+      )
+      IconButton(onClick = { loadApps() }, enabled = !isLoading) {
+        Icon(Icons.Default.Refresh, contentDescription = "Refresh & Reshuffle")
+      }
+    }
+
+    // Search and Filters layout
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      OutlinedTextField(
+        value = searchQuery,
+        onValueChange = { searchQuery = it },
+        placeholder = { Text("Search apps...") },
+        modifier = Modifier.weight(1f),
+        singleLine = true
+      )
+
+      ElevatedFilterChip(
+        selected = showFavouritesOnly,
+        onClick = { showFavouritesOnly = !showFavouritesOnly },
+        label = { Text("Favourites") },
+        leadingIcon = {
+          Icon(
+            imageVector = if (showFavouritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+            contentDescription = "Filter Favourites",
+            tint = if (showFavouritesOnly) Color.Red else Color.Gray
+          )
+        }
+      )
+    }
 
     if (isLoading) {
       Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -102,16 +159,29 @@ fun AppsScreen(modifier: Modifier = Modifier) {
           }
         }
       }
+    } else if (filteredApps.isEmpty()) {
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("No apps found.")
+      }
     } else {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp)
       ) {
-        items(appsList) { app ->
-          EcosystemAppCard(app = app) { url ->
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            context.startActivity(intent)
-          }
+        items(filteredApps) { app ->
+          val isFavourite = favouriteApps.contains(app.name)
+          EcosystemAppCard(
+            app = app,
+            isFavourite = isFavourite,
+            onFavouriteToggle = {
+              settingsStore.toggleFavouriteApp(app.name)
+              favouriteApps = settingsStore.getFavouriteApps()
+            },
+            onLinkClick = { url ->
+              val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+              context.startActivity(intent)
+            }
+          )
         }
       }
     }
@@ -119,7 +189,12 @@ fun AppsScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EcosystemAppCard(app: EcosystemApp, onLinkClick: (String) -> Unit) {
+fun EcosystemAppCard(
+  app: EcosystemApp,
+  isFavourite: Boolean,
+  onFavouriteToggle: () -> Unit,
+  onLinkClick: (String) -> Unit
+) {
   Card(
     modifier = Modifier.fillMaxWidth(),
     shape = RoundedCornerShape(12.dp),
@@ -140,6 +215,26 @@ fun EcosystemAppCard(app: EcosystemApp, onLinkClick: (String) -> Unit) {
           .padding(16.dp),
         contentAlignment = Alignment.BottomStart
       ) {
+        // Favourite Heart Button in the Top-Right of the Card
+        Box(
+          modifier = Modifier
+            .fillMaxSize(),
+          contentAlignment = Alignment.TopEnd
+        ) {
+          IconButton(
+            onClick = { onFavouriteToggle() },
+            modifier = Modifier.padding(4.dp)
+          ) {
+            Icon(
+              imageVector = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+              contentDescription = "Toggle Favourite",
+              tint = if (isFavourite) Color.Red else Color.White,
+              modifier = Modifier.background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
+                .padding(8.dp)
+            )
+          }
+        }
+
         Column {
           Text(
             text = app.name,
