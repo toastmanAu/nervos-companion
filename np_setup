@@ -1,0 +1,324 @@
+I want to build an android app that is a general Nervos Network Companion App. App should have a persistent 5 button bottom menu with icons for Home, News, applications, tools,settings. Home Should be dashboard Showing chain data, price summary, the latest news item, a logo.  News should be an auto pooled list of selected Nervos Talk forum posts, Twitter Posts from selected accounts, any other links flagged by me via github integration. Applications should be links to ecosystem applications. Each link should be a encased in a full width 800x320 horizonttal panel with background artwork, Title, breif description and social media links as clickable buttons underneath the panel. Tools Should lead to a menu with network tools built into the app, for example embed daoview.org into a page. There should also be an integrated ckb console terminal off a tool button click. a terminal page in bitcoin core "console" fashion but newer and more intuitive, Settings should allow a user definable node field which defaults to a public rpc but also lists alternatives like ankr, utxo global. Lets formulate a plan for agentic development 
+
+Here’s a solid agentic development plan.
+
+## Recommended stack
+
+**Android app:** Kotlin + Jetpack Compose
+**Storage:** Room DB + DataStore
+**Networking:** Ktor or Retrofit
+**Background polling:** WorkManager
+**Web embeds:** Android WebView
+**Charts:** Compose chart library or custom Canvas
+**Terminal console:** custom Compose UI calling JSON-RPC against selected CKB node
+
+CKB has official JSON-RPC docs, and Ankr/GetBlock-style hosted node providers exist, so the app should treat RPC providers as configurable rather than hardcoded. ([Nervos CKB][1])
+
+---
+
+# App structure
+
+## Bottom nav: 5 persistent tabs
+
+1. **Home**
+2. **News**
+3. **Apps**
+4. **Tools**
+5. **Settings**
+
+Use Compose `Scaffold` with a persistent `NavigationBar`.
+
+---
+
+# Screen plan
+
+## 1. Home Dashboard
+
+Cards:
+
+**Hero/logo card**
+
+* Nervos logo/artwork
+* Current selected RPC provider
+* Sync status / RPC latency
+
+**Chain data**
+
+* Tip block number
+* Epoch
+* Difficulty/hashrate if available
+* DAO stats if pulled from explorer/API
+* Node status
+
+**Price summary**
+
+* CKB price
+* 24h change
+* market cap / volume
+* data source toggle later: CoinGecko, KuCoin, CMC, etc. CoinGecko exposes CKB price pages/data, but use API where possible. ([CoinGecko][2])
+
+**Latest news item**
+
+* One promoted item from the News feed
+* Tap opens detail/source
+
+---
+
+## 2. News Feed
+
+Create a unified `NewsItem` model:
+
+```kotlin
+data class NewsItem(
+    val id: String,
+    val sourceType: SourceType,
+    val title: String,
+    val summary: String?,
+    val url: String,
+    val author: String?,
+    val publishedAt: Long,
+    val tags: List<String>,
+    val pinned: Boolean = false
+)
+```
+
+Sources:
+
+**Nervos Talk**
+
+* If it is Discourse-based, use RSS or JSON endpoints where possible. Discourse commonly exposes latest/topic feeds and API-style access. ([Discourse Meta][3])
+
+**X/Twitter**
+
+* Best handled through your own backend/GitHub-curated JSON unless you want API costs/fragility.
+* Store selected accounts in a remote config file.
+
+**GitHub flagged links**
+
+* Have a repo file like:
+
+```json
+[
+  {
+    "title": "Fiber Network update",
+    "url": "https://...",
+    "source": "github-curated",
+    "tags": ["fiber", "rgb++"],
+    "pinned": true
+  }
+]
+```
+
+This gives you editorial control without needing a backend.
+
+---
+
+## 3. Applications
+
+Each app entry:
+
+```kotlin
+data class EcosystemApp(
+    val name: String,
+    val description: String,
+    val category: String,
+    val websiteUrl: String,
+    val twitterUrl: String?,
+    val githubUrl: String?,
+    val discordUrl: String?,
+    val panelImageUrl: String
+)
+```
+
+UI card spec:
+
+* Full-width horizontal panel
+* Artwork ratio: **800 × 320**
+* Title overlay
+* Brief description
+* Buttons below/over panel:
+
+  * Website
+  * X
+  * GitHub
+  * Discord
+  * Docs
+
+Use remote JSON first so you can update ecosystem links without app updates.
+
+---
+
+## 4. Tools
+
+Tools menu buttons:
+
+**DAO Viewer**
+
+* WebView wrapper for `daoview.org`
+
+**CKB RPC Console**
+
+* Bitcoin Core console-inspired terminal
+* Input field with autocomplete
+* Command history
+* Saved snippets
+* Pretty JSON output
+* Method templates:
+
+  * `get_tip_block_number`
+  * `get_tip_header`
+  * `get_block_by_number`
+  * `get_transaction`
+  * `get_live_cell`
+  * `local_node_info`
+
+Console UX idea:
+
+```text
+> get_tip_block_number
+0x123456
+
+> get_tip_header
+{
+  "compact_target": "...",
+  "dao": "...",
+  "epoch": "..."
+}
+```
+
+Add modes:
+
+* **Simple mode:** buttons/forms
+* **Raw mode:** direct JSON-RPC
+
+---
+
+## 5. Settings
+
+Fields:
+
+**RPC Provider**
+
+* Default public RPC
+* Ankr
+* UTXO Global
+* GetBlock
+* Custom node URL
+
+**User-defined node**
+
+* URL
+* Network: mainnet/testnet
+* Test connection button
+* Latency display
+* Save as default
+
+**News sources**
+
+* Enable/disable Nervos Talk
+* Enable/disable X mirror feed
+* Enable/disable GitHub curated links
+
+**Appearance**
+
+* Light/dark/system
+* Accent color
+* Compact cards toggle
+
+---
+
+# Data architecture
+
+## Local DB tables
+
+```text
+news_items
+ecosystem_apps
+rpc_providers
+settings
+cached_chain_stats
+price_snapshots
+console_history
+```
+
+## Remote config files
+
+Host these in GitHub:
+
+```text
+/config/apps.json
+/config/news_sources.json
+/config/rpc_providers.json
+/config/featured_links.json
+/config/tool_links.json
+```
+
+App checks GitHub raw files periodically and caches them locally.
+
+---
+
+# Development phases
+
+## Phase 1 — Skeleton app
+
+Agent task:
+
+```text
+Create a Kotlin Jetpack Compose Android app with 5 persistent bottom navigation tabs: Home, News, Apps, Tools, Settings. Use Material 3. Add placeholder screens and navigation state. Include app theme, dark mode support, and reusable card components.
+```
+
+## Phase 2 — Settings + RPC provider system
+
+```text
+Implement a Settings screen using DataStore. Add RPC provider selection, custom RPC URL field, test connection button, and save selected provider. Create RpcClient capable of sending JSON-RPC POST requests to the selected CKB endpoint.
+```
+
+## Phase 3 — Home dashboard
+
+```text
+Build Home dashboard cards for chain stats, price summary, latest news, and logo hero. Pull chain stats from RpcClient. Cache latest successful result. Show loading, error, and stale data states.
+```
+
+## Phase 4 — News aggregator
+
+```text
+Create NewsRepository that fetches Nervos Talk RSS/JSON, GitHub curated links JSON, and optional social feed JSON. Normalize all into NewsItem. Store in Room. Add WorkManager polling. Build News screen with filters by source and tag.
+```
+
+## Phase 5 — Ecosystem apps directory
+
+```text
+Create EcosystemApp model and AppsRepository that loads apps from GitHub raw JSON. Build full-width 800x320 artwork cards with title, description, and clickable social buttons. Cache images and app data locally.
+```
+
+## Phase 6 — Tools page
+
+```text
+Create Tools menu. Add WebView screen for external tools like daoview.org. Add CKB Console screen with command input, command history, JSON pretty output, autocomplete for known RPC methods, and raw JSON-RPC mode.
+```
+
+## Phase 7 — Polish
+
+```text
+Add branded Nervos visual styling, animated loading states, offline cache indicators, pull-to-refresh, error banners, and onboarding explaining public RPC versus custom node usage.
+```
+
+---
+
+# Best MVP cut
+
+Build first:
+
+1. Bottom nav shell
+2. Settings RPC selector
+3. Home chain stats
+4. Apps directory from GitHub JSON
+5. Basic RPC console
+6. News feed from GitHub curated links first
+
+Then add Nervos Talk/X automation after the core UX is working.
+
+[1]: https://docs.nervos.org/docs/getting-started/rpcs?utm_source=chatgpt.com "RPCs | Nervos CKB"
+[2]: https://www.coingecko.com/en/coins/nervos-network?utm_source=chatgpt.com "Nervos Network Price Chart (CKB)"
+[3]: https://meta.discourse.org/t/how-can-i-authorize-latest-rss-and-new-rss-for-api-access-on-a-private-forum/188480?utm_source=chatgpt.com "How can I authorize latest.rss and new.rss for API access on a ..."
+
