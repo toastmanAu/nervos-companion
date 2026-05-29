@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object Apps : NavKey
 @Serializable data object Tools : NavKey
 @Serializable data object Settings : NavKey
-@Serializable data object DaoViewer : NavKey
+@Serializable
+data class WebBrowser(val url: String, val title: String) : NavKey
 @Serializable data object CkbConsole : NavKey
 

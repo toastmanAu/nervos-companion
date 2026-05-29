@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
-fun DaoViewerScreen(modifier: Modifier = Modifier) {
+fun DaoViewerScreen(url: String, modifier: Modifier = Modifier) {
   AndroidView(
     factory = { context ->
       WebView(context).apply {
@@ -24,7 +24,7 @@ fun DaoViewerScreen(modifier: Modifier = Modifier) {
       }
     },
     update = { webView ->
-      webView.loadUrl("https://daoview.org")
+      webView.loadUrl(url)
     },
     modifier = modifier.fillMaxSize()
   )

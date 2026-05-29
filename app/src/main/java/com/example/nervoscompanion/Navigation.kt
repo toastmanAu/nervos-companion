@@ -38,7 +38,7 @@ fun MainNavigation() {
           Home -> Home
           News -> News
           Apps -> Apps
-          Tools, DaoViewer, CkbConsole -> Tools
+          Tools, is WebBrowser, CkbConsole -> Tools
           Settings -> Settings
           else -> Home
         }
@@ -129,8 +129,8 @@ fun MainNavigation() {
         entry<Settings> {
           SettingsScreen()
         }
-        entry<DaoViewer> {
-          DaoViewerScreen()
+        entry<WebBrowser> { key ->
+          DaoViewerScreen(url = key.url)
         }
         entry<CkbConsole> {
           ConsoleScreen()
