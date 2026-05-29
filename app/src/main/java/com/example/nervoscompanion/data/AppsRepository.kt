@@ -123,24 +123,6 @@ class AppsRepository(private val settingsStore: SettingsStore) {
         bannerGradientColors = listOf(0xFF8A2387, 0xFFE94057, 0xFFF27121)
       ),
       EcosystemApp(
-        name = ".bit DID",
-        description = "Cross-chain Web3 identities (.bit) built natively on Nervos Network.",
-        websiteUrl = "https://did.id",
-        twitterUrl = "https://x.com/dotbitDID",
-        githubUrl = "https://github.com/dotbitDID",
-        discordUrl = "https://discord.gg/dotbit",
-        bannerGradientColors = listOf(0xFF11998E, 0xFF38EF7D)
-      ),
-      EcosystemApp(
-        name = "Yokai Swap",
-        description = "An AMM-based decentralized exchange (DEX) running on Godwoken Layer 2.",
-        websiteUrl = "https://yokaiswap.com",
-        twitterUrl = "https://x.com/yokaiswap",
-        githubUrl = "https://github.com/yokaiswap",
-        discordUrl = "https://discord.gg/yokaiswap",
-        bannerGradientColors = listOf(0xFF00C6FF, 0xFF0072FF)
-      ),
-      EcosystemApp(
         name = "Nervos DAO",
         description = "Deposit your CKB into the system smart contract to offset secondary issuance inflation.",
         websiteUrl = "https://docs.nervos.org/docs/basics/concepts/nervos-dao",
@@ -148,6 +130,60 @@ class AppsRepository(private val settingsStore: SettingsStore) {
         githubUrl = "https://github.com/nervosnetwork",
         discordUrl = "https://discord.gg/nervos",
         bannerGradientColors = listOf(0xFF1F1C2C, 0xFF928DAB)
+      ),
+      EcosystemApp(
+        name = "iCKB",
+        description = "A liquid staking protocol for the Nervos DAO allowing users to obtain tradeable liquidity.",
+        websiteUrl = "https://ickb.org",
+        twitterUrl = null,
+        githubUrl = "https://github.com/ickb",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF00C6FF, 0xFF0072FF)
+      ),
+      EcosystemApp(
+        name = "Quantum Purse",
+        description = "A self-custodial open-source wallet featuring quantum-resistant post-quantum cryptography signature protection.",
+        websiteUrl = "https://github.com/QuantumPurse",
+        twitterUrl = null,
+        githubUrl = "https://github.com/QuantumPurse",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF7F00FF, 0xFFE100FF)
+      ),
+      EcosystemApp(
+        name = "Pocket Node",
+        description = "A mobile CKB light client wallet on Android running a localized node on-device for sovereignty.",
+        websiteUrl = "https://pocket-node.com",
+        twitterUrl = null,
+        githubUrl = "https://github.com/pocket-node",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF11998E, 0xFF38EF7D)
+      ),
+      EcosystemApp(
+        name = "mobit.app",
+        description = "A decentralized Web3 ecosystem wallet interface supporting asset management and RGB++ Leap.",
+        websiteUrl = "https://mobit.app",
+        twitterUrl = null,
+        githubUrl = null,
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF1D976C, 0xFF93F9B9)
+      ),
+      EcosystemApp(
+        name = "NervDAO",
+        description = "A user-friendly decentralized staking portal to easily interact with the Nervos DAO smart contract.",
+        websiteUrl = "https://nervdao.com",
+        twitterUrl = null,
+        githubUrl = "https://github.com/nervdao",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF141E30, 0xFF243B55)
+      ),
+      EcosystemApp(
+        name = "Hold'em Bulls Poker",
+        description = "A community-driven, provably fair Texas Hold'em poker application built natively on Nervos CKB.",
+        websiteUrl = "https://holdembulls.poker",
+        twitterUrl = null,
+        githubUrl = null,
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFFED213A, 0xFF93291E)
       )
     )
   }

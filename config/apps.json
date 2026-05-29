@@ -9,24 +9,6 @@
     "bannerGradientColors": ["#8A2387", "#E94057", "#F27121"]
   },
   {
-    "name": ".bit DID",
-    "description": "Cross-chain Web3 identities (.bit) built natively on Nervos Network.",
-    "websiteUrl": "https://did.id",
-    "twitterUrl": "https://x.com/dotbitDID",
-    "githubUrl": "https://github.com/dotbitDID",
-    "discordUrl": "https://discord.gg/dotbit",
-    "bannerGradientColors": ["#11998E", "#38EF7D"]
-  },
-  {
-    "name": "Yokai Swap",
-    "description": "An AMM-based decentralized exchange (DEX) running on Godwoken Layer 2.",
-    "websiteUrl": "https://yokaiswap.com",
-    "twitterUrl": "https://x.com/yokaiswap",
-    "githubUrl": "https://github.com/yokaiswap",
-    "discordUrl": "https://discord.gg/yokaiswap",
-    "bannerGradientColors": ["#00C6FF", "#0072FF"]
-  },
-  {
     "name": "Nervos DAO",
     "description": "Deposit your CKB into the system smart contract to offset secondary issuance inflation.",
     "websiteUrl": "https://docs.nervos.org/docs/basics/concepts/nervos-dao",
@@ -34,5 +16,45 @@
     "githubUrl": "https://github.com/nervosnetwork",
     "discordUrl": "https://discord.gg/nervos",
     "bannerGradientColors": ["#1F1C2C", "#928DAB"]
+  },
+  {
+    "name": "iCKB",
+    "description": "A liquid staking protocol for the Nervos DAO allowing users to obtain tradeable liquidity.",
+    "websiteUrl": "https://ickb.org",
+    "githubUrl": "https://github.com/ickb",
+    "bannerGradientColors": ["#00C6FF", "#0072FF"]
+  },
+  {
+    "name": "Quantum Purse",
+    "description": "A self-custodial open-source wallet featuring quantum-resistant post-quantum cryptography signature protection.",
+    "websiteUrl": "https://github.com/QuantumPurse",
+    "githubUrl": "https://github.com/QuantumPurse",
+    "bannerGradientColors": ["#7F00FF", "#E100FF"]
+  },
+  {
+    "name": "Pocket Node",
+    "description": "A mobile CKB light client wallet on Android running a localized node on-device for sovereignty.",
+    "websiteUrl": "https://pocket-node.com",
+    "githubUrl": "https://github.com/pocket-node",
+    "bannerGradientColors": ["#11998E", "#38EF7D"]
+  },
+  {
+    "name": "mobit.app",
+    "description": "A decentralized Web3 ecosystem wallet interface supporting asset management and RGB++ Leap.",
+    "websiteUrl": "https://mobit.app",
+    "bannerGradientColors": ["#1D976C", "#93F9B9"]
+  },
+  {
+    "name": "NervDAO",
+    "description": "A user-friendly decentralized staking portal to easily interact with the Nervos DAO smart contract.",
+    "websiteUrl": "https://nervdao.com",
+    "githubUrl": "https://github.com/nervdao",
+    "bannerGradientColors": ["#141E30", "#243B55"]
+  },
+  {
+    "name": "Hold'em Bulls Poker",
+    "description": "A community-driven, provably fair Texas Hold'em poker application built natively on Nervos CKB.",
+    "websiteUrl": "https://holdembulls.poker",
+    "bannerGradientColors": ["#ED213A", "#93291E"]
   }
 ]
