@@ -68,6 +68,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
   var searchQuery by remember { mutableStateOf("") }
   var showFavouritesOnly by remember { mutableStateOf(false) }
   var favouriteApps by remember { mutableStateOf(settingsStore.getFavouriteApps()) }
+  var supportEmail by remember { mutableStateOf("developer@example.com") }
 
   fun loadApps() {
     isLoading = true
@@ -76,6 +77,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
       try {
         // Randomize the order of apps when loading for fairness of visibility
         appsList = appsRepository.fetchApps().shuffled()
+        supportEmail = appsRepository.fetchSupportEmail()
       } catch (e: Exception) {
         errorMsg = "Failed to load apps: ${e.localizedMessage}"
       } finally {
@@ -221,7 +223,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
                       Discord URL (Optional): 
                       Banner Gradient Hex Colors (comma-separated, e.g., #8A2387, #E94057): 
                     """.trimIndent()
-                    launchEmailIntent(context, "developer@example.com", "[Nervos Companion] Ecosystem App Submission", body)
+                    launchEmailIntent(context, supportEmail, "[Nervos Companion] Ecosystem App Submission", body)
                   },
                   modifier = Modifier.weight(1f)
                 ) {
@@ -241,7 +243,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
                       Updated Discord URL: 
                       Updated Banner Gradient Hex Colors: 
                     """.trimIndent()
-                    launchEmailIntent(context, "developer@example.com", "[Nervos Companion] Ecosystem App Update Request", body)
+                    launchEmailIntent(context, supportEmail, "[Nervos Companion] Ecosystem App Update Request", body)
                   },
                   modifier = Modifier.weight(1f)
                 ) {

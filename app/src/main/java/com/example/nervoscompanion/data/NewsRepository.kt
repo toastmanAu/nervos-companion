@@ -63,13 +63,12 @@ class NewsRepository(
     }
 
     // 2. Fetch Curated Links and X Mirror Feeds from configurable Repository
-    val repoUrl = settingsStore.rpcUrl // Wait, settingsStore can store a repoConfigUrl
-    // Let's use a default repo or the settingsStore's config
-    val baseRepoUrl = "https://raw.githubusercontent.com/nervosnetwork/community/main/" // default fallback
+    val baseRepoUrl = settingsStore.configBaseUrl
+    val targetUrl = baseRepoUrl.trim().removeSuffix("/") + "/featured_links.json"
     
     // Fetch featured links
     try {
-      val url = URL(baseRepoUrl + "featured_links.json") // We can mock this if it fails
+      val url = URL(targetUrl) // We can mock this if it fails
       val conn = url.openConnection() as HttpURLConnection
       conn.connectTimeout = 3000
       conn.readTimeout = 3000

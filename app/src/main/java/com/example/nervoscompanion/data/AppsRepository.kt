@@ -89,6 +89,28 @@ class AppsRepository(private val settingsStore: SettingsStore) {
     apps.distinctBy { it.name }
   }
 
+  suspend fun fetchSupportEmail(): String = withContext(Dispatchers.IO) {
+    val baseConfigUrl = settingsStore.configBaseUrl
+    val targetUrl = baseConfigUrl.trim().removeSuffix("/") + "/support.json"
+    try {
+      val url = URL(targetUrl)
+      val conn = url.openConnection() as HttpURLConnection
+      conn.connectTimeout = 5000
+      conn.readTimeout = 5000
+      
+      if (conn.responseCode == HttpURLConnection.HTTP_OK) {
+        val text = conn.inputStream.bufferedReader().use { it.readText() }
+        val obj = JSONObject(text)
+        obj.optString("supportEmail", "developer@example.com")
+      } else {
+        "developer@example.com"
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+      "developer@example.com"
+    }
+  }
+
   private fun getLocalPresets(): List<EcosystemApp> {
     return listOf(
       EcosystemApp(

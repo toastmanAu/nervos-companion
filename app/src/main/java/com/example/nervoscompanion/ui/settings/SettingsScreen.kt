@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.nervoscompanion.data.RpcClient
 import com.example.nervoscompanion.data.SettingsStore
+import com.example.nervoscompanion.data.AppsRepository
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.lang.System
@@ -44,7 +45,20 @@ import java.lang.System
 fun SettingsScreen(modifier: Modifier = Modifier) {
   val context = LocalContext.current
   val settingsStore = remember { SettingsStore(context) }
+  val appsRepository = remember { AppsRepository(settingsStore) }
   val coroutineScope = rememberCoroutineScope()
+
+  var supportEmail by remember { mutableStateOf("developer@example.com") }
+
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      try {
+        supportEmail = appsRepository.fetchSupportEmail()
+      } catch (e: Exception) {
+        // Fallback already handled inside AppsRepository
+      }
+    }
+  }
 
   var rpcUrl by remember { mutableStateOf(settingsStore.rpcUrl) }
   var rpcNetwork by remember { mutableStateOf(settingsStore.rpcNetwork) }
@@ -315,7 +329,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             
             val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
               data = android.net.Uri.parse("mailto:")
-              putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("developer@example.com"))
+              putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf(supportEmail))
               putExtra(android.content.Intent.EXTRA_SUBJECT, "[Nervos Companion] Feedback & Bug Report")
               putExtra(android.content.Intent.EXTRA_TEXT, body)
             }

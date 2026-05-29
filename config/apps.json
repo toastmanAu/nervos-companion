@@ -1,0 +1,38 @@
+[
+  {
+    "name": "JoyID Wallet",
+    "description": "A passwordless passkey wallet on Nervos CKB supporting multi-chain assets.",
+    "websiteUrl": "https://joy.id",
+    "twitterUrl": "https://x.com/joy_protocol",
+    "githubUrl": "https://github.com/nervina-labs/joyid",
+    "discordUrl": "https://discord.gg/joyid",
+    "bannerGradientColors": ["#8A2387", "#E94057", "#F27121"]
+  },
+  {
+    "name": ".bit DID",
+    "description": "Cross-chain Web3 identities (.bit) built natively on Nervos Network.",
+    "websiteUrl": "https://did.id",
+    "twitterUrl": "https://x.com/dotbitDID",
+    "githubUrl": "https://github.com/dotbitDID",
+    "discordUrl": "https://discord.gg/dotbit",
+    "bannerGradientColors": ["#11998E", "#38EF7D"]
+  },
+  {
+    "name": "Yokai Swap",
+    "description": "An AMM-based decentralized exchange (DEX) running on Godwoken Layer 2.",
+    "websiteUrl": "https://yokaiswap.com",
+    "twitterUrl": "https://x.com/yokaiswap",
+    "githubUrl": "https://github.com/yokaiswap",
+    "discordUrl": "https://discord.gg/yokaiswap",
+    "bannerGradientColors": ["#00C6FF", "#0072FF"]
+  },
+  {
+    "name": "Nervos DAO",
+    "description": "Deposit your CKB into the system smart contract to offset secondary issuance inflation.",
+    "websiteUrl": "https://docs.nervos.org/docs/basics/concepts/nervos-dao",
+    "twitterUrl": "https://x.com/NervosNetwork",
+    "githubUrl": "https://github.com/nervosnetwork",
+    "discordUrl": "https://discord.gg/nervos",
+    "bannerGradientColors": ["#1F1C2C", "#928DAB"]
+  }
+]
