@@ -56,5 +56,69 @@
     "description": "A community-driven, provably fair Texas Hold'em poker application built natively on Nervos CKB.",
     "websiteUrl": "https://holdembulls.poker",
     "bannerGradientColors": ["#ED213A", "#93291E"]
+  },
+  {
+    "name": "Rosen Bridge",
+    "description": "A decentralized, trustless, and multi-layered bridge connecting Nervos CKB with Cardano, Ergo, Bitcoin, and other networks.",
+    "websiteUrl": "https://rosen.tech",
+    "twitterUrl": "https://x.com/RosenBridge_erg",
+    "githubUrl": "https://github.com/rosen-bridge",
+    "bannerGradientColors": ["#1F1C2C", "#928DAB"]
+  },
+  {
+    "name": "Perun Network",
+    "description": "State channel protocol implementation on CKB to enable real-time, micro-transaction channels off-chain.",
+    "websiteUrl": "https://perun.network",
+    "twitterUrl": "https://x.com/PerunNetwork",
+    "githubUrl": "https://github.com/hyperledger-labs/perun-ckb-backend",
+    "bannerGradientColors": ["#11998E", "#38EF7D"]
+  },
+  {
+    "name": "CKBoost",
+    "description": "A decentralized launchpad and suite of tools providing liquidity and developer resources for the Nervos ecosystem.",
+    "websiteUrl": "https://github.com/ckboost",
+    "githubUrl": "https://github.com/ckboost",
+    "bannerGradientColors": ["#F7971E", "#FFD200"]
+  },
+  {
+    "name": "Scryve",
+    "description": "A decentralized publishing platform and blog archive built on top of Nervos CKB cell storage.",
+    "websiteUrl": "https://github.com/scryve",
+    "githubUrl": "https://github.com/scryve",
+    "bannerGradientColors": ["#4A00E0", "#8E2DE2"]
+  },
+  {
+    "name": "CellSwap",
+    "description": "A working proof-of-concept DOB/CKBFS cell storage demo site. Store and manage cell resources.",
+    "websiteUrl": "https://cellswap.xyz/",
+    "githubUrl": "https://github.com/cellswap",
+    "bannerGradientColors": ["#11998E", "#38EF7D"]
+  },
+  {
+    "name": "ByteRent",
+    "description": "An early proof-of-concept demo of on-chain space/storage rental services for smart contracts.",
+    "websiteUrl": "https://byterent.xyz/",
+    "githubUrl": "https://github.com/byterent",
+    "bannerGradientColors": ["#7F00FF", "#E100FF"]
+  },
+  {
+    "name": "Nervos DAO Viewer",
+    "description": "Embed and browse daoview.org directly in the app. Monitor active DAO deposits, withdrawal epochs, and system statistics.",
+    "websiteUrl": "https://daoview.org",
+    "bannerGradientColors": ["#0F2027", "#203A43", "#2C5364"]
+  },
+  {
+    "name": "CellScript",
+    "description": "A type-safe domain-specific language (DSL) for the Cell model on Nervos CKB, simplifying smart contract development.",
+    "websiteUrl": "https://github.com/a19q3/CellScript",
+    "githubUrl": "https://github.com/a19q3/CellScript",
+    "bannerGradientColors": ["#2C3E50", "#000000"]
+  },
+  {
+    "name": "Fiber Storybook",
+    "description": "An interactive, narrative-driven demo explaining the features and advantages of the CKB Fiber Network.",
+    "websiteUrl": "https://fiber-storybook-seven.vercel.app/",
+    "githubUrl": "https://github.com/yfeng2824/fiber-storybook",
+    "bannerGradientColors": ["#11998E", "#38EF7D"]
   }
 ]

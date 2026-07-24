@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.example.nervoscompanion.data.NewsItem
 import com.example.nervoscompanion.data.NewsRepository
 import com.example.nervoscompanion.data.SettingsStore
+import com.example.nervoscompanion.ui.components.TabHeader
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -55,7 +56,10 @@ import java.util.Locale
 fun NewsScreen(modifier: Modifier = Modifier) {
   val context = LocalContext.current
   val settingsStore = remember { SettingsStore(context) }
-  val newsRepository = remember { NewsRepository(settingsStore) }
+  val newsRepository = remember {
+    val db = com.example.nervoscompanion.data.cache.AppDatabase.getDatabase(context)
+    NewsRepository(db.newsDao(), settingsStore)
+  }
   val coroutineScope = rememberCoroutineScope()
 
   var newsList by remember { mutableStateOf<List<NewsItem>>(emptyList()) }
@@ -103,12 +107,7 @@ fun NewsScreen(modifier: Modifier = Modifier) {
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = "Nervos News Feed",
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
-      )
+      TabHeader(title = "News Feed")
       IconButton(onClick = { loadNews() }, enabled = !isLoading) {
         Icon(Icons.Default.Refresh, contentDescription = "Refresh")
       }

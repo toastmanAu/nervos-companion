@@ -1,17 +1,16 @@
 package com.example.nervoscompanion
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
@@ -24,7 +23,13 @@ import com.example.nervoscompanion.ui.apps.AppsScreen
 import com.example.nervoscompanion.ui.tools.ToolsScreen
 import com.example.nervoscompanion.ui.tools.ConsoleScreen
 import com.example.nervoscompanion.ui.tools.DaoViewerScreen
+import com.example.nervoscompanion.ui.tools.FiberHomeScreen
+import com.example.nervoscompanion.ui.tools.TxCalculatorScreen
+import com.example.nervoscompanion.ui.tools.DaoDashboardScreen
+import com.example.nervoscompanion.ui.tools.RfcViewerScreen
+import com.example.nervoscompanion.ui.tools.RfcDetailScreen
 import com.example.nervoscompanion.ui.settings.SettingsScreen
+import com.example.nervoscompanion.theme.currentTheme
 
 @Composable
 fun MainNavigation() {
@@ -38,10 +43,17 @@ fun MainNavigation() {
           Home -> Home
           News -> News
           Apps -> Apps
-          Tools, is WebBrowser, CkbConsole -> Tools
+          Tools, is WebBrowser, CkbConsole, FiberHome, TxCalculator, DaoDashboard, RfcViewer, is RfcDetail -> Tools
           Settings -> Settings
           else -> Home
         }
+
+        val theme = currentTheme
+        val navItemColors = NavigationBarItemDefaults.colors(
+          selectedTextColor = theme.colorScheme.primary,
+          unselectedTextColor = Color.Gray,
+          indicatorColor = theme.colorScheme.primary.copy(alpha = 0.15f)
+        )
 
         NavigationBarItem(
           selected = selectedTab == Home,
@@ -51,8 +63,9 @@ fun MainNavigation() {
               backStack.add(Home)
             }
           },
-          icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-          label = { Text("Home") }
+          icon = { Icon(painterResource(id = theme.homeIconResId), contentDescription = "Home", tint = Color.Unspecified, modifier = Modifier.size(28.dp)) },
+          label = { Text("Home") },
+          colors = navItemColors
         )
 
         NavigationBarItem(
@@ -63,8 +76,9 @@ fun MainNavigation() {
               backStack.add(News)
             }
           },
-          icon = { Icon(Icons.Default.List, contentDescription = "News") },
-          label = { Text("News") }
+          icon = { Icon(painterResource(id = theme.newsIconResId), contentDescription = "News", tint = Color.Unspecified, modifier = Modifier.size(28.dp)) },
+          label = { Text("News") },
+          colors = navItemColors
         )
 
         NavigationBarItem(
@@ -75,8 +89,9 @@ fun MainNavigation() {
               backStack.add(Apps)
             }
           },
-          icon = { Icon(Icons.Default.Info, contentDescription = "Apps") },
-          label = { Text("Apps") }
+          icon = { Icon(painterResource(id = theme.appsIconResId), contentDescription = "Apps", tint = Color.Unspecified, modifier = Modifier.size(28.dp)) },
+          label = { Text("Apps") },
+          colors = navItemColors
         )
 
         NavigationBarItem(
@@ -87,8 +102,9 @@ fun MainNavigation() {
               backStack.add(Tools)
             }
           },
-          icon = { Icon(Icons.Default.Build, contentDescription = "Tools") },
-          label = { Text("Tools") }
+          icon = { Icon(painterResource(id = theme.toolsIconResId), contentDescription = "Tools", tint = Color.Unspecified, modifier = Modifier.size(28.dp)) },
+          label = { Text("Tools") },
+          colors = navItemColors
         )
 
         NavigationBarItem(
@@ -99,8 +115,9 @@ fun MainNavigation() {
               backStack.add(Settings)
             }
           },
-          icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-          label = { Text("Settings") }
+          icon = { Icon(painterResource(id = theme.settingsIconResId), contentDescription = "Settings", tint = Color.Unspecified, modifier = Modifier.size(28.dp)) },
+          label = { Text("Settings") },
+          colors = navItemColors
         )
       }
     }
@@ -121,7 +138,7 @@ fun MainNavigation() {
           NewsScreen()
         }
         entry<Apps> {
-          AppsScreen()
+          AppsScreen(onNavigate = { key -> backStack.add(key) })
         }
         entry<Tools> {
           ToolsScreen(onNavigate = { key -> backStack.add(key) })
@@ -134,6 +151,21 @@ fun MainNavigation() {
         }
         entry<CkbConsole> {
           ConsoleScreen()
+        }
+        entry<FiberHome> {
+          FiberHomeScreen(onNavigate = { key -> backStack.add(key) })
+        }
+        entry<TxCalculator> {
+          TxCalculatorScreen(onNavigate = { key -> backStack.add(key) })
+        }
+        entry<DaoDashboard> {
+          DaoDashboardScreen(onNavigate = { key -> backStack.add(key) })
+        }
+        entry<RfcViewer> {
+          RfcViewerScreen(onNavigate = { key -> backStack.add(key) })
+        }
+        entry<RfcDetail> { key ->
+          RfcDetailScreen(rfcNumber = key.rfcNumber, onNavigate = { key -> backStack.add(key) })
         }
       }
     )

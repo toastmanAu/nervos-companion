@@ -1,0 +1,54 @@
+{
+  "theme_customization_blueprint": {
+    "title": "CKB Directory Theme Creation Guide",
+    "description": "Use this JSON template to design custom style themes for the CKB Directory Android app and submit them via PR or issue.",
+    "theme_structure": {
+      "id": {
+        "type": "String",
+        "description": "Unique identifier for the theme (e.g. 'retro_neon')",
+        "example": "cyberpunk"
+      },
+      "displayName": {
+        "type": "String",
+        "description": "Name shown to users in the settings screen",
+        "example": "Cyberpunk Neon"
+      },
+      "colorScheme": {
+        "primary": "Hex color code for primary accents (e.g., button overlays, active selections)",
+        "secondary": "Hex color code for secondary UI details",
+        "background": "Hex color code for base fallback background",
+        "surface": "Hex color code for cards, settings dialogs, and navigation containers"
+      },
+      "splash": {
+        "bgColor": "Hex color code for splash screen base background",
+        "imageFileName": "Name of the splash background PNG/Vector drawable asset to be placed in res/drawable"
+      },
+      "home_hero": {
+        "imageFileName": "Name of the home panel hero background image (should have an aspect ratio of 2.5:1, e.g. 500x200px)"
+      },
+      "bgGradientColors": {
+        "type": "Array of Strings",
+        "description": "List of hex color codes for the main application background gradient (smooth vertical gradient)",
+        "example": ["#0D020D", "#220822"]
+      },
+      "headerStyle": {
+        "fontStyle": "Visual font and text treatment mode. Supported values: 'classic' (default bold), 'neon' (glowing text), 'ocean' (cyan underlines/shadows), 'stealth' (monospace minimal)",
+        "showGlow": "Boolean indicating whether to apply a radial glowing effect behind page headers",
+        "textGradient": "Array of hex colors to draw text characters as a gradient (optional)"
+      },
+      "icons": {
+        "home": "XML resource name of the custom vector icon to show in the Home tab",
+        "news": "XML resource name of the custom vector icon to show in the News tab",
+        "apps": "XML resource name of the custom vector icon to show in the Apps tab",
+        "tools": "XML resource name of the custom vector icon to show in the Tools tab",
+        "settings": "XML resource name of the custom vector icon to show in the Settings tab"
+      }
+    },
+    "how_to_submit": [
+      "1. Place your custom drawable files (splash PNG, hero banner JPG/PNG, and custom tab SVGs/XMLs) inside the '/app/src/main/res/drawable/' folder.",
+      "2. Define your theme attributes matching this JSON structure.",
+      "3. Register your theme object inside '/app/src/main/java/com/example/nervoscompanion/theme/Theme.kt'.",
+      "4. Submit a Pull Request to the main CKB Directory repository."
+    ]
+  }
+}

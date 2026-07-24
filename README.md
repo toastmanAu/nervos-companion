@@ -30,11 +30,11 @@ An all-in-one unofficial Android companion application for the **Nervos Network 
 
 ## Roadmap & Next Milestones
 
-*   [ ] **Room Database Caching**: Cache fetched news items, apps directory, and chain stats locally for offline-first support.
-*   [ ] **WorkManager Polling**: Implement automated background workers to query chain tip status and send notifications on block events.
-*   [ ] **Push Notifications**: Integrate Firebase Cloud Messaging (FCM) or local alerts for chain events or curated announcements.
-*   [ ] **Transaction Viewer & Calculator**: Add tools for parsing CKB transaction hashes and calculating DAO yields.
-*   [ ] **Fiber Network Integration**: Next-generation lightning network channel monitoring features.
+*   [x] **Room Database Caching**: Cache fetched news items, apps directory, and chain stats locally for offline-first support.
+*   [x] **WorkManager Polling**: Implement automated background workers to query chain tip status and send notifications on block events.
+*   [x] **Push Notifications**: Integrate Firebase Cloud Messaging (FCM) or local alerts for chain events or curated announcements.
+*   [x] **Transaction Viewer & Calculator**: Add tools for parsing CKB transaction hashes and calculating DAO yields.
+*   [x] **Fiber Network Integration**: Next-generation lightning network channel monitoring features.
 
 ---
 

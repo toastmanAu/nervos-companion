@@ -6,6 +6,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import com.example.nervoscompanion.data.cache.EcosystemAppDao
+import com.example.nervoscompanion.data.cache.EcosystemAppEntity
 
 data class EcosystemApp(
   val name: String,
@@ -17,7 +19,30 @@ data class EcosystemApp(
   val bannerGradientColors: List<Long>
 )
 
-class AppsRepository(private val settingsStore: SettingsStore) {
+fun EcosystemAppEntity.toDomain() = EcosystemApp(
+  name = name,
+  description = description,
+  websiteUrl = websiteUrl,
+  twitterUrl = twitterUrl,
+  githubUrl = githubUrl,
+  discordUrl = discordUrl,
+  bannerGradientColors = bannerGradientColors
+)
+
+fun EcosystemApp.toEntity() = EcosystemAppEntity(
+  name = name,
+  description = description,
+  websiteUrl = websiteUrl,
+  twitterUrl = twitterUrl,
+  githubUrl = githubUrl,
+  discordUrl = discordUrl,
+  bannerGradientColors = bannerGradientColors
+)
+
+class AppsRepository(
+  private val ecosystemAppDao: EcosystemAppDao,
+  private val settingsStore: SettingsStore
+) {
 
   private fun parseHexColor(hex: String): Long {
     return try {
@@ -33,6 +58,13 @@ class AppsRepository(private val settingsStore: SettingsStore) {
   }
 
   suspend fun fetchApps(): List<EcosystemApp> = withContext(Dispatchers.IO) {
+    // 1. Check local cache first
+    val cachedEntities = try {
+      ecosystemAppDao.getAllApps()
+    } catch (e: Exception) {
+      emptyList()
+    }
+
     val apps = mutableListOf<EcosystemApp>()
     val baseConfigUrl = settingsStore.configBaseUrl
     val targetUrl = baseConfigUrl.trim().removeSuffix("/") + "/apps.json"
@@ -78,15 +110,50 @@ class AppsRepository(private val settingsStore: SettingsStore) {
             )
           )
         }
-      } else {
-        apps.addAll(getLocalPresets())
       }
     } catch (e: Exception) {
       e.printStackTrace()
-      apps.addAll(getLocalPresets())
     }
 
-    apps.distinctBy { it.name }
+    val resultList = apps.distinctBy { it.name }
+
+    if (resultList.isEmpty()) {
+      if (cachedEntities.isNotEmpty()) {
+        val cachedDomains = cachedEntities.map { it.toDomain() }
+        val mergedOffline = (cachedDomains + getLocalPresets()).distinctBy { it.name }
+        if (mergedOffline.size > cachedEntities.size) {
+          try {
+            ecosystemAppDao.deleteAllApps()
+            ecosystemAppDao.insertApps(mergedOffline.map { it.toEntity() })
+          } catch (e: Exception) {
+            e.printStackTrace()
+          }
+        }
+        return@withContext mergedOffline
+      } else {
+        val presets = getLocalPresets()
+        try {
+          ecosystemAppDao.insertApps(presets.map { it.toEntity() })
+        } catch (e: Exception) {
+          e.printStackTrace()
+        }
+        return@withContext presets
+      }
+    }
+
+    // Merge fetched apps with local presets to ensure new apps are always included,
+    // with remote configuration updates taking precedence for duplicates.
+    val mergedList = (resultList + getLocalPresets()).distinctBy { it.name }
+
+    // Save to cache
+    try {
+      ecosystemAppDao.deleteAllApps()
+      ecosystemAppDao.insertApps(mergedList.map { it.toEntity() })
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+
+    mergedList
   }
 
   suspend fun fetchSupportEmail(): String = withContext(Dispatchers.IO) {
@@ -101,13 +168,13 @@ class AppsRepository(private val settingsStore: SettingsStore) {
       if (conn.responseCode == HttpURLConnection.HTTP_OK) {
         val text = conn.inputStream.bufferedReader().use { it.readText() }
         val obj = JSONObject(text)
-        obj.optString("supportEmail", "developer@example.com")
+        obj.optString("supportEmail", "phill@wyltek.com")
       } else {
-        "developer@example.com"
+        "phill@wyltek.com"
       }
     } catch (e: Exception) {
       e.printStackTrace()
-      "developer@example.com"
+      "phill@wyltek.com"
     }
   }
 
@@ -184,7 +251,122 @@ class AppsRepository(private val settingsStore: SettingsStore) {
         githubUrl = null,
         discordUrl = null,
         bannerGradientColors = listOf(0xFFED213A, 0xFF93291E)
+      ),
+      EcosystemApp(
+        name = "Rosen Bridge",
+        description = "A decentralized, trustless, and multi-layered bridge connecting Nervos CKB with Cardano, Ergo, Bitcoin, and other networks.",
+        websiteUrl = "https://rosen.tech",
+        twitterUrl = "https://x.com/RosenBridge_erg",
+        githubUrl = "https://github.com/rosen-bridge",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF1F1C2C, 0xFF928DAB)
+      ),
+      EcosystemApp(
+        name = "Perun Network",
+        description = "State channel protocol implementation on CKB to enable real-time, micro-transaction channels off-chain.",
+        websiteUrl = "https://perun.network",
+        twitterUrl = "https://x.com/PerunNetwork",
+        githubUrl = "https://github.com/hyperledger-labs/perun-ckb-backend",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF11998E, 0xFF38EF7D)
+      ),
+      EcosystemApp(
+        name = "CKBoost",
+        description = "A decentralized launchpad and suite of tools providing liquidity and developer resources for the Nervos ecosystem.",
+        websiteUrl = "https://github.com/ckboost",
+        twitterUrl = null,
+        githubUrl = "https://github.com/ckboost",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFFF7971E, 0xFFFFD200)
+      ),
+      EcosystemApp(
+        name = "Scryve",
+        description = "A decentralized publishing platform and blog archive built on top of Nervos CKB cell storage.",
+        websiteUrl = "https://github.com/scryve",
+        twitterUrl = null,
+        githubUrl = "https://github.com/scryve",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF4A00E0, 0xFF8E2DE2)
+      ),
+      EcosystemApp(
+        name = "CellSwap",
+        description = "A working proof-of-concept DOB/CKBFS cell storage demo site. Store and manage cell resources.",
+        websiteUrl = "https://cellswap.xyz/",
+        twitterUrl = null,
+        githubUrl = "https://github.com/cellswap",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF11998E, 0xFF38EF7D)
+      ),
+      EcosystemApp(
+        name = "ByteRent",
+        description = "An early proof-of-concept demo of on-chain space/storage rental services for smart contracts.",
+        websiteUrl = "https://byterent.xyz/",
+        twitterUrl = null,
+        githubUrl = "https://github.com/byterent",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF7F00FF, 0xFFE100FF)
+      ),
+      EcosystemApp(
+        name = "Nervos DAO Viewer",
+        description = "Embed and browse daoview.org directly in the app. Monitor active DAO deposits, withdrawal epochs, and system statistics.",
+        websiteUrl = "https://daoview.org",
+        twitterUrl = null,
+        githubUrl = null,
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF0F2027, 0xFF203A43, 0xFF2C5364)
+      ),
+      EcosystemApp(
+        name = "CellScript",
+        description = "A type-safe domain-specific language (DSL) for the Cell model on Nervos CKB, simplifying smart contract development.",
+        websiteUrl = "https://github.com/a19q3/CellScript",
+        twitterUrl = null,
+        githubUrl = "https://github.com/a19q3/CellScript",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF2C3E50, 0xFF000000)
+      ),
+      EcosystemApp(
+        name = "Fiber Storybook",
+        description = "An interactive, narrative-driven demo explaining the features and advantages of the CKB Fiber Network.",
+        websiteUrl = "https://fiber-storybook-seven.vercel.app/",
+        twitterUrl = null,
+        githubUrl = "https://github.com/yfeng2824/fiber-storybook",
+        discordUrl = null,
+        bannerGradientColors = listOf(0xFF11998E, 0xFF38EF7D)
       )
     )
   }
+
+  suspend fun checkForUpdates(): AppUpdate? = withContext(Dispatchers.IO) {
+    val baseConfigUrl = settingsStore.configBaseUrl
+    val targetUrl = baseConfigUrl.trim().removeSuffix("/") + "/version.json"
+    try {
+      val url = URL(targetUrl)
+      val conn = url.openConnection() as HttpURLConnection
+      conn.connectTimeout = 5000
+      conn.readTimeout = 5000
+      
+      if (conn.responseCode == HttpURLConnection.HTTP_OK) {
+        val text = conn.inputStream.bufferedReader().use { it.readText() }
+        val obj = JSONObject(text)
+        AppUpdate(
+          versionCode = obj.getInt("versionCode"),
+          versionName = obj.getString("versionName"),
+          downloadUrl = obj.getString("downloadUrl"),
+          changelog = obj.optString("changelog", "")
+        )
+      } else {
+        null
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+      null
+    }
+  }
 }
+
+data class AppUpdate(
+  val versionCode: Int,
+  val versionName: String,
+  val downloadUrl: String,
+  val changelog: String
+)

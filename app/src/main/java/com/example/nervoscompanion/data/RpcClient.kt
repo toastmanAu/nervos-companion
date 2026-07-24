@@ -8,13 +8,22 @@ import java.net.URL
 import org.json.JSONArray
 import org.json.JSONObject
 
-class RpcClient(private val rpcUrl: String) {
+class RpcClient(rpcUrl: String, private val authToken: String? = null) {
+
+  private val formattedUrl = if (!rpcUrl.startsWith("http://") && !rpcUrl.startsWith("https://")) {
+    "http://$rpcUrl"
+  } else {
+    rpcUrl
+  }
 
   suspend fun call(method: String, params: List<Any> = emptyList()): String = withContext(Dispatchers.IO) {
-    val connection = (URL(rpcUrl).openConnection() as HttpURLConnection).apply {
+    val connection = (URL(formattedUrl).openConnection() as HttpURLConnection).apply {
       requestMethod = "POST"
       doOutput = true
       setRequestProperty("Content-Type", "application/json")
+      if (!authToken.isNullOrEmpty()) {
+        setRequestProperty("Authorization", "Bearer $authToken")
+      }
       connectTimeout = 5000
       readTimeout = 5000
     }

@@ -11,4 +11,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WebBrowser(val url: String, val title: String) : NavKey
 @Serializable data object CkbConsole : NavKey
+@Serializable data object FiberHome : NavKey
+@Serializable data object TxCalculator : NavKey
+@Serializable data object DaoDashboard : NavKey
+@Serializable data object RfcViewer : NavKey
+@Serializable data class RfcDetail(val rfcNumber: String) : NavKey
+
+
+
 

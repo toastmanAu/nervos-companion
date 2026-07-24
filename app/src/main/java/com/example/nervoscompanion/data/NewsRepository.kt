@@ -8,6 +8,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.nervoscompanion.data.cache.NewsDao
+import com.example.nervoscompanion.data.cache.NewsEntity
 
 data class NewsItem(
   val id: String,
@@ -19,11 +21,39 @@ data class NewsItem(
   val tags: List<String>
 )
 
+fun NewsEntity.toDomain() = NewsItem(
+  id = id,
+  source = source,
+  title = title,
+  summary = summary,
+  url = url,
+  publishedAt = publishedAt,
+  tags = tags
+)
+
+fun NewsItem.toEntity() = NewsEntity(
+  id = id,
+  source = source,
+  title = title,
+  summary = summary,
+  url = url,
+  publishedAt = publishedAt,
+  tags = tags
+)
+
 class NewsRepository(
+  private val newsDao: NewsDao,
   private val settingsStore: SettingsStore
 ) {
 
   suspend fun fetchAllNews(): List<NewsItem> = withContext(Dispatchers.IO) {
+    // 1. Load cached news first (if any)
+    val cachedEntities = try {
+      newsDao.getAllNews()
+    } catch (e: Exception) {
+      emptyList()
+    }
+
     val items = mutableListOf<NewsItem>()
 
     // 1. Fetch Nervos Talk JSON feed
@@ -96,16 +126,38 @@ class NewsRepository(
             )
           )
         }
-      } else {
-        // Fallback mock items
-        items.addAll(getMockFeaturedLinks())
       }
     } catch (e: Exception) {
-      items.addAll(getMockFeaturedLinks())
+      e.printStackTrace()
+    }
+
+    // If both fetches failed and we have cache, return cache
+    if (items.isEmpty()) {
+      if (cachedEntities.isNotEmpty()) {
+        return@withContext cachedEntities.map { it.toDomain() }
+      } else {
+        // Fallback mock items
+        val mock = getMockFeaturedLinks()
+        try {
+          newsDao.insertNews(mock.map { it.toEntity() })
+        } catch (e: Exception) {
+          e.printStackTrace()
+        }
+        return@withContext mock
+      }
     }
 
     // Sort descending by time
     items.sortByDescending { it.publishedAt }
+
+    // Update cache
+    try {
+      newsDao.deleteAllNews()
+      newsDao.insertNews(items.map { it.toEntity() })
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+
     items
   }
 

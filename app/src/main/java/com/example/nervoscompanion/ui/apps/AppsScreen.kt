@@ -23,7 +23,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.example.nervoscompanion.data.SkinType
+import com.example.nervoscompanion.data.ScaleType
+import com.example.nervoscompanion.data.PanelManifest
+import com.example.nervoscompanion.ui.components.SkinPickerDialog
+import com.example.nervoscompanion.ui.components.TabHeader
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -45,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -55,12 +65,17 @@ import com.example.nervoscompanion.data.AppsRepository
 import com.example.nervoscompanion.data.EcosystemApp
 import com.example.nervoscompanion.data.SettingsStore
 import kotlinx.coroutines.launch
+import androidx.navigation3.runtime.NavKey
+import com.example.nervoscompanion.WebBrowser
 
 @Composable
-fun AppsScreen(modifier: Modifier = Modifier) {
+fun AppsScreen(onNavigate: (NavKey) -> Unit, modifier: Modifier = Modifier) {
   val context = LocalContext.current
   val settingsStore = remember { SettingsStore(context) }
-  val appsRepository = remember { AppsRepository(settingsStore) }
+  val appsRepository = remember {
+    val db = com.example.nervoscompanion.data.cache.AppDatabase.getDatabase(context)
+    AppsRepository(db.ecosystemAppDao(), settingsStore)
+  }
   val coroutineScope = rememberCoroutineScope()
 
   var appsList by remember { mutableStateOf<List<EcosystemApp>>(emptyList()) }
@@ -70,7 +85,13 @@ fun AppsScreen(modifier: Modifier = Modifier) {
   var searchQuery by remember { mutableStateOf("") }
   var showFavouritesOnly by remember { mutableStateOf(false) }
   var favouriteApps by remember { mutableStateOf(settingsStore.getFavouriteApps()) }
-  var supportEmail by remember { mutableStateOf("developer@example.com") }
+  var releaseAlertApps by remember { mutableStateOf(settingsStore.getReleaseAlertApps()) }
+  var supportEmail by remember { mutableStateOf("phill@wyltek.com") }
+
+  var showPickerDialog by remember { mutableStateOf(false) }
+  var editingAppId by remember { mutableStateOf("") }
+  var editingAppName by remember { mutableStateOf("") }
+  var refreshTrigger by remember { mutableStateOf(0) }
 
   fun loadApps() {
     isLoading = true
@@ -110,12 +131,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = "Ecosystem Directory",
-        style = MaterialTheme.typography.headlineMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary
-      )
+      TabHeader(title = "Ecosystem Directory")
       IconButton(onClick = { loadApps() }, enabled = !isLoading) {
         Icon(Icons.Default.Refresh, contentDescription = "Refresh & Reshuffle")
       }
@@ -174,6 +190,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
       ) {
         items(filteredApps) { app ->
           val isFavourite = favouriteApps.contains(app.name)
+          val isReleaseAlert = releaseAlertApps.contains(app.name)
           EcosystemAppCard(
             app = app,
             isFavourite = isFavourite,
@@ -181,9 +198,25 @@ fun AppsScreen(modifier: Modifier = Modifier) {
               settingsStore.toggleFavouriteApp(app.name)
               favouriteApps = settingsStore.getFavouriteApps()
             },
+            isReleaseAlert = isReleaseAlert,
+            onReleaseAlertToggle = {
+              settingsStore.toggleReleaseAlertApp(app.name)
+              releaseAlertApps = settingsStore.getReleaseAlertApps()
+            },
             onLinkClick = { url ->
-              val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-              context.startActivity(intent)
+              if (url.contains("daoview.org")) {
+                onNavigate(WebBrowser(url = url, title = app.name))
+              } else {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(intent)
+              }
+            },
+            settingsStore = settingsStore,
+            refreshTrigger = refreshTrigger,
+            onReskinClick = {
+              editingAppId = app.name
+              editingAppName = app.name
+              showPickerDialog = true
             }
           )
         }
@@ -225,7 +258,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
                       Discord URL (Optional): 
                       Banner Gradient Hex Colors (comma-separated, e.g., #8A2387, #E94057): 
                     """.trimIndent()
-                    launchEmailIntent(context, supportEmail, "[Nervos Companion] Ecosystem App Submission", body)
+                    launchEmailIntent(context, supportEmail, "[CKB Directory] Ecosystem App Submission", body)
                   },
                   modifier = Modifier.weight(1f)
                 ) {
@@ -245,7 +278,7 @@ fun AppsScreen(modifier: Modifier = Modifier) {
                       Updated Discord URL: 
                       Updated Banner Gradient Hex Colors: 
                     """.trimIndent()
-                    launchEmailIntent(context, supportEmail, "[Nervos Companion] Ecosystem App Update Request", body)
+                    launchEmailIntent(context, supportEmail, "[CKB Directory] Ecosystem App Update Request", body)
                   },
                   modifier = Modifier.weight(1f)
                 ) {
@@ -257,6 +290,16 @@ fun AppsScreen(modifier: Modifier = Modifier) {
         }
       }
     }
+  }
+
+  if (showPickerDialog) {
+    SkinPickerDialog(
+      cardId = editingAppId,
+      cardName = editingAppName,
+      settingsStore = settingsStore,
+      onDismissRequest = { showPickerDialog = false },
+      onSkinApplied = { refreshTrigger++ }
+    )
   }
 }
 
@@ -280,8 +323,20 @@ fun EcosystemAppCard(
   app: EcosystemApp,
   isFavourite: Boolean,
   onFavouriteToggle: () -> Unit,
-  onLinkClick: (String) -> Unit
+  isReleaseAlert: Boolean,
+  onReleaseAlertToggle: () -> Unit,
+  onLinkClick: (String) -> Unit,
+  settingsStore: SettingsStore,
+  refreshTrigger: Int,
+  onReskinClick: () -> Unit
 ) {
+  val skinType = remember(app.name, refreshTrigger) { settingsStore.getCardSkinType(app.name) }
+  val skinPath = remember(app.name, refreshTrigger) { settingsStore.getCardSkinPath(app.name) }
+  val scaleType = remember(app.name, refreshTrigger) { settingsStore.getCardScaleType(app.name) }
+
+  val contentScale = if (scaleType == ScaleType.CROP) ContentScale.Crop else ContentScale.FillBounds
+  val defaultUrl = remember(app.name) { PanelManifest.getDefaultAssetUrl(app.name) }
+
   Card(
     modifier = Modifier.fillMaxWidth(),
     shape = RoundedCornerShape(12.dp),
@@ -293,36 +348,95 @@ fun EcosystemAppCard(
         modifier = Modifier
           .fillMaxWidth()
           .aspectRatio(8f / 3f)
+          .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
           .background(
             Brush.linearGradient(
               colors = app.bannerGradientColors.map { Color(it) }
             )
           )
-          .clickable { onLinkClick(app.websiteUrl) }
-          .padding(16.dp),
+          .clickable { onLinkClick(app.websiteUrl) },
         contentAlignment = Alignment.BottomStart
       ) {
-        // Favourite Heart Button in the Top-Right of the Card
+        val imageModel = when (skinType) {
+          SkinType.DEFAULT -> defaultUrl
+          SkinType.WEBSITE -> skinPath ?: defaultUrl
+          SkinType.CUSTOM -> skinPath
+        }
+
+        if (imageModel != null) {
+          AsyncImage(
+            model = imageModel,
+            contentDescription = null,
+            contentScale = contentScale,
+            modifier = Modifier.matchParentSize()
+          )
+        }
+
         Box(
           modifier = Modifier
-            .fillMaxSize(),
-          contentAlignment = Alignment.TopEnd
+            .matchParentSize()
+            .background(
+              Brush.verticalGradient(
+                colors = listOf(Color.Black.copy(alpha = 0.15f), Color.Black.copy(alpha = 0.6f))
+              )
+            )
+        )
+
+        // Action Buttons in the Top-Right of the Card
+        Row(
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+          horizontalArrangement = Arrangement.End,
+          verticalAlignment = Alignment.Top
         ) {
+          if (!app.githubUrl.isNullOrEmpty()) {
+            IconButton(
+              onClick = { onReleaseAlertToggle() }
+            ) {
+              Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Toggle Release Alerts",
+                tint = if (isReleaseAlert) Color(0xFF00FFCC) else Color.White,
+                modifier = Modifier
+                  .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
+                  .padding(8.dp)
+              )
+            }
+          }
           IconButton(
-            onClick = { onFavouriteToggle() },
-            modifier = Modifier.padding(4.dp)
+            onClick = { onFavouriteToggle() }
           ) {
             Icon(
               imageVector = if (isFavourite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
               contentDescription = "Toggle Favourite",
               tint = if (isFavourite) Color.Red else Color.White,
-              modifier = Modifier.background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
+              modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
+                .padding(8.dp)
+            )
+          }
+
+          // Reskin Paintbrush icon button
+          IconButton(
+            onClick = { onReskinClick() }
+          ) {
+            Icon(
+              imageVector = Icons.Default.Edit,
+              contentDescription = "Reskin Card",
+              tint = Color.White,
+              modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(50))
                 .padding(8.dp)
             )
           }
         }
 
-        Column {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+        ) {
           Text(
             text = app.name,
             color = Color.White,

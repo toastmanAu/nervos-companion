@@ -25,13 +25,30 @@ import com.example.nervoscompanion.data.SettingsStore
 import com.example.nervoscompanion.theme.NervosCompanionTheme
 import com.example.nervoscompanion.theme.currentThemeName
 import kotlinx.coroutines.delay
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.nervoscompanion.data.work.WorkManagerHelper
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     val settingsStore = SettingsStore(this)
     currentThemeName = settingsStore.themeName
+
+    // Check and request runtime notification permissions on Android 13+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+      }
+    }
+
+    // Automatically schedule polling task if enabled
+    if (settingsStore.isBackgroundSyncEnabled) {
+      WorkManagerHelper.schedule(this)
+    }
 
     enableEdgeToEdge()
     setContent {
@@ -57,12 +74,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen() {
+  val theme = com.example.nervoscompanion.theme.currentTheme
   Box(
-    modifier = Modifier.fillMaxSize().background(Color.Black),
+    modifier = Modifier.fillMaxSize().background(theme.splashBgColor),
     contentAlignment = Alignment.Center
   ) {
     Image(
-      painter = painterResource(id = R.drawable.splash_screen),
+      painter = painterResource(id = theme.splashImageResId),
       contentDescription = "Splash Screen",
       modifier = Modifier.fillMaxSize(),
       contentScale = ContentScale.Crop

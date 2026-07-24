@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="CKB Directory"
+            android:textColor="#00CC99"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_last_updated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/widget_refresh_button"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:text="Updated: --:--"
+            android:textColor="#88FFFFFF"
+            android:textSize="10sp" />
+
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_rotate"
+            android:contentDescription="Refresh Widget" />
+    </RelativeLayout>
+
+    <!-- Horizontal Divider -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#20302B"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Content Columns -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="8dp">
+
+        <!-- Column 1: CKB Price -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CKB Price"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/widget_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$--.----"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_price_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--.--%"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Column 2: Block Height -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Block Height"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/widget_block_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#-------"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_node_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Public Node"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp"
+                android:ellipsize="end"
+                android:maxLines="1" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Horizontal Divider -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#20302B"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Content Columns 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <!-- Column 1: Epoch Progress -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Epoch Progress"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/widget_epoch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Epoch ----"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/widget_epoch_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--- / ---"
+                android:textColor="#88FFFFFF"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Column 2: Halving Countdown -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Halving Countdown"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/widget_halving_countdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="~--- days"
+                android:textColor="#00CC99"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_halving_est_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Est: ----"
+                android:textColor="#88FFFFFF"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

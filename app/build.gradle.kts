@@ -2,6 +2,8 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.android.legacy.kapt)
+
 }
 
 android {
@@ -82,4 +84,21 @@ dependencies {
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
+  // Room Caching
+  implementation(libs.room.runtime)
+  implementation(libs.room.ktx)
+  kapt(libs.room.compiler)
+
+  // WorkManager
+  implementation(libs.androidx.work.runtime.ktx)
+
+  // QR & Barcode scanner
+  implementation(libs.zxing.core)
+  implementation(libs.play.services.code.scanner)
+
+  // Coil Image Loader
+  implementation(libs.coil.compose)
 }
+
+
