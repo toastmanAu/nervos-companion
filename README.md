@@ -55,3 +55,12 @@ An all-in-one unofficial Android companion application for the **Nervos Network 
     ```bash
     android run --debug
     ```
+
+---
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE).
+
+This is an **unofficial** community project and is not affiliated with or
+endorsed by the Nervos Foundation.
